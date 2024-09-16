@@ -70,6 +70,13 @@ MARKET_ITEM_THRESHOLD = 5
 MAX_LISTING_AMOUNT = 10
 
 #=====================
+#      Others
+#=====================
+ILLEGAL_CHARACTERS = ["\\", "//", "`", "{", "}", "(", ")", "[", "]", "_", "*", "$", "#", "<", ">", "'"]
+ILLEGAL_USERNAMES = ['', ' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'The Wandering Merchant']
+BATTALION_NAME_CAP = 25
+
+#=====================
 #      Resources
 #=====================
 BIOME_RESOURCE_MIN = 5
@@ -92,7 +99,7 @@ FIEFDOM_WARRIOR_MIN = 5
 FIEFDOM_WARRIOR_MAX = 100
 
 #=====================
-#  Weather
+#      Weather
 #=====================
 WEATHER_SYSTEM_MOD = 0         #think of this as a seasonal modifier for temperature
 BASELINE_TEMP = 72              #this is the baseline for global temp calculations
@@ -214,6 +221,14 @@ NAME_DEFENSE_T6 = 'Unwavering Bastion'  #Was "Boiling Oil". Changed because boil
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #========================================================================================================
 
+#========================================================================================================
+#   Wait
+#   parameter: username
+#   returns: True/False
+#       Prevents the use of certain usernames that may interfere with menu operations.
+#========================================================================================================
+def Wait():
+    wait = input("\n    Press Enter to continue : ")
 
 #========================================================================================================
 #   FirstLaunch
@@ -248,12 +263,11 @@ def FirstLaunch():
 #       Prevents the use of certain usernames that may interfere with menu operations.
 #========================================================================================================
 def CheckLegalUsername(username):
-    illegalUserNames = ['', ' ', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', 'The Wandering Merchant']
     if len(username) < 18:
         if username.strip() == "":
             return False
-        for i in range(len(illegalUserNames)):
-            if username == illegalUserNames[i]:
+        for i in range(len(ILLEGAL_USERNAMES)):
+            if username == ILLEGAL_USERNAMES[i]:
                 return False
         return True
     os.system('clear')
@@ -2205,4 +2219,298 @@ def PurchasedGood(userStronghold, num):
 #    now = datetime.now()
 #    current_time = now.strftime("%H:%M")
 #    logFile.write('\n' + username + ' |--| Time: ' + current_time + ' |--| Event: ' + inputString)
+
+
+
+
+
+
+
+
+
+#========================================================================================================
+#   [IsPositiveIntEqualOrGreaterThan]
+#   parameters: integer, amount
+#   returns: True/False
+#       Checks if passed integer is both positive and an integer and then if it is more than "amount"
+#========================================================================================================
+def IsPositiveIntEqualOrGreaterThan(integer, amount):
+    if IsPositiveInteger(integer) == False:
+        return False
+    elif int(integer) < int(amount):
+        return False
+    else:
+        return True
+
+
+
+
+#========================================================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#========================================================================================================
+#                                          Battalions
+#========================================================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#========================================================================================================
+
+#==================================================================================
+#   [GetAnswer]
+#   parameters: question, qType, comparable, cap
+#       When passed a question, checks the type and compares it to the comparable
+#       before eventually returning a proper result.
+#==================================================================================
+def GetAnswer(question, qType, comparable, cap):
+    looping = True
+    foundChar = False
+    while looping:
+        if qType == '>':
+            response = input(question)
+            if IsPositiveIntEqualOrGreaterThan(response, comparable):
+                if cap != None:
+                    if int(response) > int(cap):
+                        print("    Error, can't be over " + str(cap) + "!")
+                    else:
+                        return response
+                else:
+                    return response
+            else:
+                print("    Input a positive integer equal to or greater than: " + str(comparable))
+        elif qType == '<':
+            response = input(question)
+            if IsPositiveIntEqualOrLessThan(response, comparable):
+                return response
+            else:
+                print("    Input a positive integer equal to or less than: " + str(comparable))
+        elif qType == 'in':
+            response = input(question)
+            if response in comparable:
+                return response
+            else:
+                print("    Choose a proper option from: " + str(*comparable))
+
+        elif qType == 'legalString':
+            response = input(question)
+            if int(len(response)) <= int(cap):
+                for i in range(len(ILLEGAL_USERNAMES)):
+                    if str(ILLEGAL_USERNAMES[i]) == str(response):
+                        print("    Error, not a legal input!")
+                        return ""
+                for i in range(len(ILLEGAL_CHARACTERS)):
+                    for j in range(len(response)):
+                        if response[j] == ILLEGAL_CHARACTERS[i]:
+                            foundChar = True
+                            badChar = response[j]
+                            break
+                    else:
+                        continue
+                    break
+                if foundChar:
+                    print("    Error, can't use " + str(badChar) + " in input!\n")
+                else:
+                    return response
+            else:
+                print("    Error, input can't be longer than " + str(cap) + " characters!\n")
+        else:
+            return ""
+
+        
+
+#==================================================================================
+#   [CreateNewBattalion]
+#   parameter: station
+#       Makes a new battalion at the passed station
+#==================================================================================
+def CreateNewBattalion(station):
+    if isinstance(station, Stronghold):
+        os.system("clear")
+        header(station.name)
+        if int(station.defenders) < BATTALION_MIN:
+            print("\n    You don't have enough warriors at this location to make a battalion!\n")
+            nothing = input("    Press enter to continue : ")
+            return "battalions"
+        else:
+            name = "Default Battalion"
+            commander = str(station.ruler)
+            numTroops = BATTALION_MIN
+            attLevel = station.attLevel
+            speed = 1
+            stamina = 1
+            rations = 0
+            xPos = str(station.xCoordinate)
+            yPos = str(station.yCoordinate)
+
+            os.system("clear")
+            header(station.name)
+            print("\n    Creating New Battalion: \n")
+
+            name = GetAnswer("    Name your Battalion: ", "legalString", None, BATTALION_NAME_CAP)
+            if str(name) == "":
+                return "battalions"
+            if serverArmies.ExistingName(name):
+                print("\n    Battalion name already taken!")
+                nothing = input("    Press enter to continue : ")
+                return "battalions"
+            print("")
+            numTroops = GetAnswer(str("    How many troops will you assign to " + WARNING + str(name) + RESET + "? [min " + str(BATTALION_MIN) + "]: "), ">", BATTALION_MIN, BATTALION_MAX)
+            if int(numTroops) > int(station.defenders):
+                print("    You don't have enough troops for this battalion!\n")
+                nothing = input("    Press enter to continue : ")
+                return "battalions"
+            print("")
+
+            serverArmies.AddBattalion(str(name), str(commander), str(numTroops), str(attLevel), str(speed), str(stamina), str(rations), str(xPos), str(yPos), 0, 0, 0, 0, 0)
+            serverArmies.write()
+
+            station.defenders = int(station.defenders) - int(numTroops)
+            station.write()
+
+            nothing = input("    Press enter to continue : ")
+            return "battalions"
+
+    else:
+        os.system("clear")
+        headerFief(station)
+        if int(station.defenders) < BATTALION_MIN:
+            print("\n    You don't have enough warriors at this location to make a battalion!\n")
+            nothing = input("    Press enter to continue : ")
+            return "battalions"
+            
+    return "battalions"
+
+
+#==================================================================================
+#   [CheckBiome]
+#   parameter: surroundings, direction, haveRaft
+#==================================================================================
+def CheckBiome(biome, direction, haveRaft):
+    #If the way is blocked by water:
+    # if biome == WATER:
+    #     print("    A body of " + IC_WATER + "water" + RESET + " blocks your path to the " + direction)
+    #     return ""
+    # if biome == RIVER[0]:
+    #     print("    A Southwest-bound " + IC_RIVER + "river" + RESET + " blocks your path to the " + direction)
+    #     return ""
+    # if biome == RIVER[1]:
+    #     print("    A South-bound " + IC_RIVER + "river" + RESET + " blocks your path to the " + direction)
+    #     return ""
+    # if biome == RIVER[2]:
+    #     print("    A Southeast-bound " + IC_RIVER + "river" + RESET + " blocks your path to the " + direction)
+    #     return ""
+
+    #For testing purposes, add a "raft" attribute:
+    if str(biome) == WATER:
+        print("    Your troops raft through the " + IC_WATER + "water" + RESET + " to the " + str(direction))
+        return ""
+    if str(biome) == RIVER[0]:
+        print("    Your troops raft over the Southwest-bound " + IC_RIVER + "river" + RESET + " to the " + str(direction))
+        return ""
+    if str(biome) == RIVER[1]:
+        print("    Your troops raft over the South-bound " + IC_RIVER + "river" + RESET + " to the " + str(direction))
+        return ""
+    if str(biome) == RIVER[2]:
+        print("    Your troops raft over the Southeast-bound " + IC_RIVER + "river" + RESET + " to the " + str(direction))
+        return ""
+    if str(biome) == MOUNTAIN:
+        print("    Your troops travel over the " + IC_MOUNTAIN + "mountain" + RESET + " to the " + str(direction))
+        return ""
+    if str(biome) == FOREST:
+        print("    Your troops travel through the " + IC_FOREST + "forest" + RESET + " to the " + str(direction))
+        return ""
+    if str(biome) == PLAINS:
+        print("    Your troops travel through the " + IC_PLAINS + "plains" + RESET + " to the " + str(direction))
+        return ""
+    if str(biome) == FIEF:
+        print("    Your troops travel to the " + IC_FIEF + "fief" + RESET + " to the " + str(direction))
+    if str(biome) == STRONGHOLD:
+        print("    Your troops travel to the " + IC_STRONGHOLD + "stronghold" + RESET + " to the " + str(direction))
+        return ""
+    
+#==================================================================================
+#   [MoveBattalion]
+#   parameter: station, battalion
+#       Moves the battalion based on direction
+#==================================================================================
+def MoveBattalion(station, battalion, direction):
+    os.system("clear")
+    headerBattalion(battalion, station, serverMap)
+    raft = True #Change this later
+    surroundings = ScanSurroundings(serverMap.worldMap, int(battalion.xPos), int(battalion.yPos))
+    #[dN, dNE, dE, dSE, dS, dSW, dW, dNW]
+    # print(*surroundings)
+    if direction == 'n':
+        check = CheckBiome(surroundings[0], 'north', raft)
+    if direction == 'ne':
+        check = CheckBiome(surroundings[1], 'northeast', raft)
+    if direction == 'e':
+        check = CheckBiome(surroundings[2], 'east', raft)
+    if direction == 'se':
+        check = CheckBiome(surroundings[3], 'southeast', raft)
+    if direction == 's':
+        check = CheckBiome(surroundings[4], 'south', raft)
+    if direction == 'sw':
+        check = CheckBiome(surroundings[5], 'southwest', raft)
+    if direction == 'w':
+        check = CheckBiome(surroundings[6], 'west', raft)
+    if direction == 'nw':
+        check = CheckBiome(surroundings[7], 'northwest', raft)
+
+    Wait()
+    
+    #Later use 'check' here to make sure a raft exists or something
+    serverArmies.SetBattalionCoords(battalion, direction)
+
+
+#==================================================================================
+#   [AvailableDirections]
+#   parameter: battalion
+#   returns: list of directions based on map constraints
+#==================================================================================
+def AvailableDirections(currentBattalion):
+    if int(currentBattalion.xPos) > 0 and int(currentBattalion.xPos) < MAP_WIDTH and int(currentBattalion.yPos) > 0 and int(currentBattalion.yPos) < MAP_HEIGHT:
+        directions = ['n', 'ne', 'e', 'se', 's', 'sw', 'w', 'nw']
+        print('    {NW} {N} {NE}')
+        print('    {W}       {E}')
+        print('    {SW} {S} {SE}')
+    elif int(currentBattalion.xPos) == 0 and int(currentBattalion.yPos) > 0 and int(currentBattalion.yPos) < MAP_HEIGHT:
+        directions = ['n', 'ne', 'e', 'se', 's']
+        print('    {X} {N} {NE}')
+        print('    {X}      {E}')
+        print('    {X} {S} {SE}')
+    elif int(currentBattalion.xPos) == MAP_WIDTH and int(currentBattalion.yPos) > 0 and int(currentBattalion.yPos) < MAP_HEIGHT:
+        directions = ['n', 's', 'sw', 'w', 'nw']
+        print('    {NW} {N} {X}')
+        print('    {W}      {X}')
+        print('    {SW} {S} {X}')
+    elif int(currentBattalion.xPos) > 0 and int(currentBattalion.xPos) < MAP_WIDTH and int(currentBattalion.yPos) == 0:
+        directions = ['e', 'se', 's', 'sw', 'w']
+        print('    {X}  {X}  {X}')
+        print('    {W}       {E}')
+        print('    {SW} {S} {SE}')
+    elif int(currentBattalion.xPos) > 0 and int(currentBattalion.xPos) < MAP_WIDTH and int(currentBattalion.yPos) == MAP_HEIGHT:
+        directions = ['n', 'ne', 'e', 'w', 'nw']
+        print('    {NW} {N} {NE}')
+        print('    {W}       {E}')
+        print('    {X}  {X}  {X}')
+    elif int(currentBattalion.xPos) == MAP_WIDTH and int(currentBattalion.yPos) == MAP_HEIGHT:
+        directions = ['n', 'w', 'nw']
+        print('    {NW} {N}  {X}')
+        print('    {W}       {X}')
+        print('    {X}  {X}  {X}')
+    elif int(currentBattalion.xPos) == 0 and int(currentBattalion.yPos) == 0:
+        directions = ['e', 'se', 's']
+        print('    {X} {X}  {X}')
+        print('    {X}      {E}')
+        print('    {X} {S} {SE}')
+    elif int(currentBattalion.xPos) == MAP_WIDTH and int(currentBattalion.yPos) == 0:
+        directions = ['s', 'sw', 'w']
+        print('    {X}  {X} {X}')
+        print('    {W}      {X}')
+        print('    {SW} {S} {X}')
+    elif int(currentBattalion.xPos) == 0 and int(currentBattalion.yPos) == MAP_HEIGHT:
+        directions = ['n', 'ne', 'e']
+        print('    {X} {N} {NE}')
+        print('    {X}      {E}')
+        print('    {X} {X}  {X}')
+    
+    return directions
 

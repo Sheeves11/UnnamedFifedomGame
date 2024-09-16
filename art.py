@@ -1,4 +1,4 @@
-from classes import *
+from worldmap import *
 
 #This displays the announcement game-wide
 #Format it with spaces at the beginning and end
@@ -24,15 +24,11 @@ def header(username):
     headerStronghold.name = username
     headerStronghold.read()
     R = textColor.RESET
-    Y = textColor.YELLOW
-    D = textColor.DARK_RED
-    M = textColor.DARK_MAGENTA
-    G = textColor.DARK_GREEN
-    E = textColor.DARK_GRAY
+    M = StrongholdColor(headerStronghold.color)
 
     # line5 = str(" Player: " + str(headerStronghold.name) + "    Gold: " + str(headerStronghold.gold) + "    Warriors: " + str(headerStronghold.defenders) + "    Thieves: " + str(headerStronghold.thieves) + ' ')
-    line5 = str(" Player: " + M + str(headerStronghold.name) + R + "    Gold: " + Y + str(headerStronghold.gold) + R + "    Warriors: " + COLOR_WARRIOR + str(headerStronghold.defenders) + RESET + "    Thieves: " + COLOR_THIEF + str(headerStronghold.thieves) + RESET + ' ')
-    line6 = str("  Food: " + D + str(headerStronghold.food) + R + "  Wood: " + G + str(headerStronghold.wood) + R + "  Stone: " + E + str(headerStronghold.stone) + R + "  Ore: " + M + str(headerStronghold.ore) + R + " ")
+    line5 = str(" Player: " + M + str(headerStronghold.name) + R + "    Gold: " + C_GOLD + str(headerStronghold.gold) + R + "    Warriors: " + COLOR_WARRIOR + str(headerStronghold.defenders) + R + "    Thieves: " + COLOR_THIEF + str(headerStronghold.thieves) + R + ' ')
+    line6 = str("  Food: " + C_FOOD + str(headerStronghold.food) + R + "  Wood: " + C_WOOD + str(headerStronghold.wood) + R + "  Stone: " + C_STONE + str(headerStronghold.stone) + R + "  Ore: " + C_ORE + str(headerStronghold.ore) + R + " ")
     
     print('\n' +
 '                                                       __        _             __           \n' +
@@ -40,7 +36,7 @@ def header(username):
 '                              |_|| || |(_||||(/_(_|   |   | (/_ | (_|(_)|||   \_|(_||||(/_   \n' +
 '   ' + '\n' +       
 
-                                        (line5.center(138, '-')) + '\n' +
+                                        (line5.center(156, '-')) + '\n' +
                                         (line6.center(155, ' ')) + '\n')
 #                                    (ANNOUNCEMENT.center(119, '-')) + ' ')
 
@@ -50,15 +46,11 @@ def headerHomeStronghold(username):
     headerStronghold.name = username
     headerStronghold.read()
     R = textColor.RESET
-    Y = textColor.YELLOW
-    D = textColor.DARK_RED
-    M = textColor.DARK_MAGENTA
-    G = textColor.DARK_GREEN
-    E = textColor.DARK_GRAY
+    M = StrongholdColor(headerStronghold.color)
 
     # line5 = str(" Player: " + str(headerStronghold.name) + "    Gold: " + str(headerStronghold.gold) + "    Warriors: " + str(headerStronghold.defenders) + "    Thieves: " + str(headerStronghold.thieves) + ' ')
-    line5 = str(" Player: " + M + str(headerStronghold.name) + R + "    Gold: " + Y + str(headerStronghold.gold) + R + "    Warriors: " + COLOR_WARRIOR + str(headerStronghold.defenders) + RESET + "    Thieves: " + COLOR_THIEF + str(headerStronghold.thieves) + RESET + ' ')
-    line6 = str("  Food: " + D + str(headerStronghold.food) + R + "  Wood: " + G + str(headerStronghold.wood) + R + "  Stone: " + E + str(headerStronghold.stone) + R + "  Ore: " + M + str(headerStronghold.ore) + R + " ")
+    line5 = str(" Player: " + M + str(headerStronghold.name) + R + "    Gold: " + C_GOLD + str(headerStronghold.gold) + R + "    Warriors: " + COLOR_WARRIOR + str(headerStronghold.defenders) + R + "    Thieves: " + COLOR_THIEF + str(headerStronghold.thieves) + R + ' ')
+    line6 = str("  Food: " + C_FOOD + str(headerStronghold.food) + R + "  Wood: " + C_WOOD + str(headerStronghold.wood) + R + "  Stone: " + C_STONE + str(headerStronghold.stone) + R + "  Ore: " + C_ORE + str(headerStronghold.ore) + R + " ")
     
     print('\n' +
 '                                                       __        _             __           \n' +
@@ -66,7 +58,7 @@ def headerHomeStronghold(username):
 '                              |_|| || |(_||||(/_(_|   |   | (/_ | (_|(_)|||   \_|(_||||(/_   \n' +
 '   ' + '\n' +       
 
-                                        (line5.center(138, '-')) + '\n' +
+                                        (line5.center(156, '-')) + '\n' +
                                         (line6.center(155, ' ')) + '\n' +
                                       (ANNOUNCEMENT.center(120, '-')) + ' ')
 
@@ -80,13 +72,9 @@ def headerWithSoldiers(username):
     headerStronghold.name = username
     headerStronghold.read()
     R = textColor.RESET
-    Y = textColor.YELLOW
-    D = textColor.DARK_RED
-    M = textColor.DARK_MAGENTA
-    G = textColor.DARK_GREEN
-    E = textColor.DARK_GRAY
+    M = StrongholdColor(headerStronghold.color)
 
-    line5 = str(" Player: " + M + str(headerStronghold.name) + R + "  Gold: " + Y + str(headerStronghold.gold) + R + "  Warriors: " + D + str(headerStronghold.defenders) + G + "Thieves: " + str(headerStronghold.thieves) + ' ')
+    line5 = str(" Player: " + M + str(headerStronghold.name) + R + "  Gold: " + C_GOLD + str(headerStronghold.gold) + R + "  Warriors: " + COLOR_WARRIOR + str(headerStronghold.defenders) + R + "Thieves: " + COLOR_THIEF + str(headerStronghold.thieves) + R + ' ')
     
     print('\n' +
 '                                                       __        _             __           \n' +
@@ -100,14 +88,6 @@ def headerWithSoldiers(username):
 
 #headerStripped() should be called when you don't need to display a full resource list
 def headerStripped():
-
-    R = textColor.RESET
-    Y = textColor.YELLOW
-    D = textColor.DARK_RED
-    M = textColor.DARK_MAGENTA
-    G = textColor.DARK_GREEN
-    E = textColor.DARK_GRAY
-    
     print('\n' +
 '                                                       __        _             __           \n' +
 '                              | |__ __  _ __  _  _|   |_  o  _ _|_ _| _ __    /__ _ __  _    \n' +
@@ -118,14 +98,6 @@ def headerStripped():
 
 #headerSuperStripped() should be called when you don't need to display a full resource list
 def headerSuperStripped():
-
-    R = textColor.RESET
-    Y = textColor.YELLOW
-    D = textColor.DARK_RED
-    M = textColor.DARK_MAGENTA
-    G = textColor.DARK_GREEN
-    E = textColor.DARK_GRAY
-    
     print('\n' +
 '                                                       __        _             __           \n' +
 '                              | |__ __  _ __  _  _|   |_  o  _ _|_ _| _ __    /__ _ __  _    \n' +
@@ -135,15 +107,14 @@ def headerSuperStripped():
 #This is an alternate header for displaying fief totals instead of stronghold totals.
 #Need to update other header at some point to show totals, perhaps?
 def headerFief(fief):
+    headerStronghold = Stronghold()
+    headerStronghold.name = fief.ruler
+    headerStronghold.read()
     R = textColor.RESET
-    Y = textColor.YELLOW
-    D = textColor.DARK_RED
-    M = textColor.DARK_MAGENTA
-    G = textColor.DARK_GREEN
-    E = textColor.DARK_GRAY
-    C = biomeColor(fief.biome)
+    M = StrongholdColor(headerStronghold.color)
+    C = BiomeColor(fief.biome)
 
-    line5 = str(" :: " + C + str(fief.name) + R + " :: | Ruler: " + M + str(fief.ruler) + R + "  Gold: " + Y + str(fief.gold) + R + "  Food: " + D + str(fief.food) + R + "  Wood: " + G + str(fief.wood) + R + "  Stone: " + E + str(fief.stone) + R + "  Ore: " + M + str(fief.ore) + R + " | ")
+    line5 = str(" :: " + C + str(fief.name) + R + " :: | Ruler: " + M + str(fief.ruler) + R + "  Gold: " + C_GOLD + str(fief.gold) + R + "  Food: " + C_FOOD + str(fief.food) + R + "  Wood: " + C_WOOD + str(fief.wood) + R + "  Stone: " + C_STONE + str(fief.stone) + R + "  Ore: " + C_ORE + str(fief.ore) + R + " | ")
 
     print('\n' +
 '                                                  __        _             __           \n' +
@@ -153,6 +124,24 @@ def headerFief(fief):
                                         (line5.center(173, '-')) + '\n')
 #                                    (ANNOUNCEMENT.center(110, '-')) + '\n')
 
+#This is a header for displaying Battalion information.
+def headerBattalion(bat, userStronghold, serverMap):
+    location = GetLocation(serverMap, int(bat.yPos), int(bat.xPos))
+    if location[0] == "":
+        menu = str(bat.MenuBar(userStronghold))
+        spacer = 210
+    else:
+        menu = str(bat.MenuBarWithLocation(userStronghold, location[0]))
+        spacer = 189
+    inventory = bat.Inventory()
+    print('\n' +
+'                                                  __        _             __           \n' +
+'                         | |__ __  _ __  _  _|   |_  o  _ _|_ _| _ __    /__ _ __  _    \n' +
+'                         |_|| || |(_||||(/_(_|   |   | (/_ | (_|(_)|||   \_|(_||||(/_   \n' +
+'   ' + '\n' +       
+                                        (menu.center(spacer, '-')) + '\n' +
+                                        (inventory.center(184, '-')) + '\n')
+                                        
 #Define Art:
 #====================================================================================================================
 #      Splash Screen Art
@@ -262,7 +251,7 @@ def art_titleScreen():
 def art_stronghold(biome, color):
     #if an error is thrown related to this art, it is likely just because 
     #the passed biome/color didn't have a value. The real problem is with the stronghold class.
-    F = strongholdColor(color)
+    F = StrongholdColor(color)
     C = biomeColor(biome)
     R = textColor.RESET
     M = textColor.MAGENTA

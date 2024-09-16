@@ -18,6 +18,7 @@ MAP_HEIGHT = 40
 DEFAULT_WEIGHT = 10         #A common weight total
 WEIGHT_INTENSITY = 5        #Determines how focused the map will be
 RANDOM_INTENSITY = 20       #Determines how chaotic the map will be
+MAP_SPACER = '              '
 
 #Old River Variables        #I'll get rid of these later
 RIVER_MAP_SCANS = 1         #Determines how many times the map is ran through when placing rivers
@@ -56,6 +57,7 @@ EMPTY = ' '
 UNEXPLORED = '0'
 LOCATION = '@'
 RANDOM = '*'
+BATTALION = 'B'
 
 #Map Icon Color
 IC_WATER = BLUE
@@ -412,25 +414,25 @@ def PrintColorMapWithFiefs(wMap, userName):
             symbol = wMap[i][j]
             if j == 0:
                 if symbol == UNEXPLORED:
-                    print('              ' + IC_UNEXPLORED + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_UNEXPLORED + symbol + RESET, end=" ")
                 elif symbol == EMPTY:
-                    print('              ' + symbol, end=" ")
+                    print(MAP_SPACER + symbol, end=" ")
                 elif symbol == WATER:
-                    print('              ' + IC_WATER + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_WATER + symbol + RESET, end=" ")
                 elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
-                    print('              ' + IC_RIVER + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_RIVER + symbol + RESET, end=" ")
                 elif symbol == FOREST:
-                    print('              ' + IC_FOREST + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_FOREST + symbol + RESET, end=" ")
                 elif symbol == PLAINS:
-                    print('              ' + IC_PLAINS + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_PLAINS + symbol + RESET, end=" ")
                 elif symbol == MOUNTAIN:
-                    print('              ' + IC_MOUNTAIN + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_MOUNTAIN + symbol + RESET, end=" ")
                 elif symbol == FIEF:
-                    print('              ' + GetFiefByOwner(i, j, userName) + RESET, end=" ")
+                    print(MAP_SPACER + GetFiefByOwner(i, j, userName) + RESET, end=" ")
                 elif symbol == STRONGHOLD:
-                    print('              ' + IC_STRONGHOLD + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_STRONGHOLD + symbol + RESET, end=" ")
                 elif symbol == LOCATION:
-                    print('              ' + IC_LOCATION + symbol + RESET, end=" ")
+                    print(MAP_SPACER + IC_LOCATION + symbol + RESET, end=" ")
             elif j == MAP_WIDTH - 1:
                 if symbol == UNEXPLORED:
                     print(IC_UNEXPLORED + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
@@ -2519,5 +2521,629 @@ def LoadingAnimation(thingLoading):
     else:
         print(thingLoading + '...')
     time.sleep(0.1)
+
+
+
+
+#--------------------------------------------------------------------------------------------------------------
+#   [PositionOffMap]
+#   parameters: y, x
+#   returns: True/False  -  if either coordinate is off the map
+#--------------------------------------------------------------------------------------------------------------
+def PositionOffMap(y, x):
+    if int(y) < 0:
+        return True
+    if int(x) < 0: 
+        return True
+    if int(y) >= MAP_HEIGHT:
+        return True
+    if int(x) >= MAP_WIDTH:
+        return True
+
+    return False
+
+
+#--------------------------------------------------------------------------------------------------------------
+#   [FarScanSurroundings]
+#   parameters: mapClass, posY, posX
+#   returns: 2d list of surroundings (2 spaces out from center)
+#--------------------------------------------------------------------------------------------------------------
+def FarScanSurroundings(mapClass, y, x):
+    wMap = mapClass.worldMap
+    posY = int(y)
+    posX = int(x)
+
+    C = LOCATION
+    try:
+        dN = wMap[posY - 1][posX]
+        if PositionOffMap(posY-1, posX):
+            dN = ' '
+    except:
+        dN = ' '
+    try:
+        dNN = wMap[posY - 2][posX]
+        if PositionOffMap(posY-2, posX):
+            dNN = ' '
+    except:
+        dNN = ' '
+    try:
+        dNE = wMap[posY - 1][posX + 1]
+        if PositionOffMap(posY-1, posX+1):
+            dNE = ' '
+    except:
+        dNE = ' '
+    try:
+        dNNE = wMap[posY - 2][posX + 1]
+        if PositionOffMap(posY-2, posX+1):
+            dNNE = ' '
+    except:
+        dNNE = ' '
+    try:
+        dNNEE = wMap[posY - 2][posX + 2]
+        if PositionOffMap(posY-2, posX+2):
+            dNNEE = ' '
+    except:
+        dNNEE = ' '
+    try:
+        dNEE = wMap[posY - 1][posX + 2]
+        if PositionOffMap(posY-1, posX+2):
+            dNEE = ' '
+    except:
+        dNEE = ' '
+    try:
+        dE = wMap[posY][posX + 1]
+        if PositionOffMap(posY, posX+1):
+            dE = ' '
+    except:
+        dE = ' '
+    try:
+        dEE = wMap[posY][posX + 2]
+        if PositionOffMap(posY, posX+2):
+            dEE = ' '
+    except:
+        dEE = ' '
+    try:
+        dSE = wMap[posY + 1][posX + 1]
+        if PositionOffMap(posY+1, posX+1):
+            dSE = ' '
+    except:
+        dSE = ' '
+    try:
+        dSEE = wMap[posY + 1][posX + 2]
+        if PositionOffMap(posY+1, posX+2):
+            dSEE = ' '
+    except:
+        dSEE = ' '
+    try:
+        dSSEE = wMap[posY + 2][posX + 2]
+        if PositionOffMap(posY+2, posX+2):
+            dSSEE = ' '
+    except:
+        dSSEE = ' '
+    try:
+        dSSE = wMap[posY + 2][posX + 1]
+        if PositionOffMap(posY+2, posX+1):
+            dSSE = ' '
+    except:
+        dSSE = ' '
+    try:
+        dS = wMap[posY + 1][posX]
+        if PositionOffMap(posY+1, posX):
+            dS = ' '
+    except:
+        dS = ' '
+    try:
+        dSS = wMap[posY + 2][posX]
+        if PositionOffMap(posY+2, posX):
+            dSS = ' '
+    except:
+        dSS = ' '
+    try:
+        dSW = wMap[posY + 1][posX - 1]
+        if PositionOffMap(posY+1, posX-1):
+            dSW = ' '
+    except:
+        dSW = ' '
+    try:
+        dSSW = wMap[posY + 2][posX - 1]
+        if PositionOffMap(posY+2, posX-1):
+            dSSW = ' '
+    except:
+        dSSW = ' '
+    try:
+        dSSWW = wMap[posY + 2][posX - 2]
+        if PositionOffMap(posY+2, posX-2):
+            dSSWW = ' '
+    except:
+        dSSWW = ' '
+    try:
+        dSWW = wMap[posY + 1][posX - 2]
+        if PositionOffMap(posY+1, posX-2):
+            dSWW = ' '
+    except:
+        dSWW = ' '
+    try:
+        dW = wMap[posY][posX - 1]
+        if PositionOffMap(posY, posX-1):
+            dW = ' '
+    except:
+        dW = ' '
+    try:
+        dWW = wMap[posY][posX - 2]
+        if PositionOffMap(posY, posX-2):
+            dWW = ' '
+    except:
+        dWW = ' '
+    try:
+        dNW = wMap[posY - 1][posX - 1]
+        if PositionOffMap(posY-1, posX-1):
+            dNW = ' '
+    except:
+        dNW = ' '
+    try:
+        dNWW = wMap[posY - 1][posX - 2]
+        if PositionOffMap(posY-1, posX-2):
+            dNWW = ' '
+    except:
+        dNWW = ' '
+    try:
+        dNNWW = wMap[posY - 2][posX - 2]
+        if PositionOffMap(posY-2, posX-2):
+            dNNWW = ' '
+    except:
+        dNNWW = ' '
+    try:
+        dNNW = wMap[posY - 2][posX - 1]
+        if PositionOffMap(posY-2, posX-1):
+            dNNW = ' '
+    except:
+        dNNW = ' '
+
+    # return [dN, dNE, dE, dSE, dS, dSW, dW, dNW]
+    # return [dN, dNN, dNE, dNNE, dNNEE, dNEE, dE, dEE, dSE, dSEE, dSSEE, dSSE, dS, dSS, dSW, dSSW, dSSWW, dSWW, dW, dWW, dNW, dNWW, dNNWW, dNNW]
+    return [[dNNWW, dNNW, dNN, dNNE, dNNEE], [dNWW, dNW, dN, dNE, dNEE], [dWW, dW, C, dE, dEE], [dSWW, dSW, dS, dSE, dSEE], [dSSWW, dSSW, dSS, dSSE, dSSEE]]
+
+#--------------------------------------------------------------------------------------------------------------
+#   [PrintMiniMap]
+#   parameters: mList
+#       prints out a minimap based on passed 2d-list
+#--------------------------------------------------------------------------------------------------------------
+def PrintMiniMap(mList, y, x):
+    borderColor = RED_GRAY
+    borderSymb = str('-')
+    print(borderColor + "    " + str("Surroundings").center(19, borderSymb) + RESET)
+    for i in range(len(mList)):
+        print(str(borderColor + "    " + borderSymb + RESET), sep='', end=' ', flush=True)
+        for j in range(len(mList[i])):
+            if str(mList[i][j]) == WATER:
+                print(str(IC_WATER + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == RIVER[0]:
+                print(str(IC_RIVER + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == RIVER[1]:
+                print(str(IC_RIVER + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == RIVER[2]:
+                print(str(IC_RIVER + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == PLAINS:
+                print(str(IC_PLAINS + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == FOREST:
+                print(str(IC_FOREST + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == MOUNTAIN:
+                print(str(IC_MOUNTAIN + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == FIEF:
+                print(str(IC_FIEF + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == STRONGHOLD:
+                print(str(IC_STRONGHOLD + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            elif str(mList[i][j]) == LOCATION:
+                print(str(BLUE_GRAY + " " + str(mList[i][j]) + RESET), sep='', end=' ', flush=True)
+            else:
+                print(str(NAVY + " " + str("*" + RESET)), sep='', end=' ', flush=True)
+        print(borderColor + " " + borderSymb + RESET)
+    print(str(borderColor + "    " + str("(" + RESET + str(x) + ", " + str(y) + borderColor + ")").center(34, borderSymb) + RESET))
+
+#--------------------------------------------------------------------------------------------------------------
+#   [GenerateMiniMap]
+#   parameters: mapClass, yPos, xPos
+#       Creates and prints out a minimap
+#--------------------------------------------------------------------------------------------------------------
+def GenerateMiniMap(mapClass, yPos, xPos):
+    mList = FarScanSurroundings(mapClass, yPos, xPos)
+    PrintMiniMap(mList, yPos, xPos)
+
+
+
+#--------------------------------------------------------------------------------------------------------------
+#   [PrintWorldMapWithLocation]
+#   Parameters: wMap, userName, yPos, xPos
+#   Iterates through a WorldMap and prints a color version. Also prints fiefs along side
+#--------------------------------------------------------------------------------------------------------------
+def PrintWorldMapWithLocation(wMap, userName, yPos, xPos):
+    for i in range(MAP_HEIGHT):
+        fiefsInRow = GetFiefRow(i, userName)
+        strongholdsInRow = GetStrongholdRow(i, userName)
+        for j in range(MAP_WIDTH):
+            symbol = wMap[i][j]
+            if j == 0:
+                if j == int(xPos) and i == int(yPos):
+                    print(MAP_SPACER + IC_LOCATION + LOCATION + RESET, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(MAP_SPACER + IC_UNEXPLORED + symbol + RESET, end=" ")
+                elif symbol == EMPTY:
+                    print(MAP_SPACER + symbol, end=" ")
+                elif symbol == WATER:
+                    print(MAP_SPACER + IC_WATER + symbol + RESET, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(MAP_SPACER + IC_RIVER + symbol + RESET, end=" ")
+                elif symbol == FOREST:
+                    print(MAP_SPACER + IC_FOREST + symbol + RESET, end=" ")
+                elif symbol == PLAINS:
+                    print(MAP_SPACER + IC_PLAINS + symbol + RESET, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(MAP_SPACER + IC_MOUNTAIN + symbol + RESET, end=" ")
+                elif symbol == FIEF:
+                    print(MAP_SPACER + GetFiefByOwner(i, j, userName) + RESET, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(MAP_SPACER + IC_STRONGHOLD + symbol + RESET, end=" ")
+                elif symbol == LOCATION:
+                    print(MAP_SPACER + IC_LOCATION + symbol + RESET, end=" ")
+            elif j == MAP_WIDTH - 1:
+                if j == int(xPos) and i == int(yPos):
+                    print(IC_LOCATION + LOCATION + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(IC_UNEXPLORED + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == EMPTY:
+                    print(symbol, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == WATER:
+                    print(IC_WATER + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(IC_RIVER + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == FOREST:
+                    print(IC_FOREST + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == PLAINS:
+                    print(IC_PLAINS + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(IC_MOUNTAIN + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == FIEF:
+                    print(GetFiefByOwner(i, j, userName) + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(IC_STRONGHOLD + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+                elif symbol == LOCATION:
+                    print(IC_LOCATION + symbol + RESET, *fiefsInRow, *strongholdsInRow, end=" ")
+            else:
+                if j == int(xPos) and i == int(yPos):
+                    print(IC_LOCATION + LOCATION + RESET, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(IC_UNEXPLORED + symbol + RESET, end=" ")
+                elif symbol == EMPTY:
+                    print(symbol, end=" ")
+                elif symbol == WATER:
+                    print(IC_WATER + symbol + RESET, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(IC_RIVER + symbol + RESET, end=" ")
+                elif symbol == FOREST:
+                    print(IC_FOREST + symbol + RESET, end=" ")
+                elif symbol == PLAINS:
+                    print(IC_PLAINS + symbol + RESET, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(IC_MOUNTAIN + symbol + RESET, end=" ")
+                elif symbol == FIEF:
+                    print(GetFiefByOwner(i, j, userName) + RESET, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(IC_STRONGHOLD + symbol + RESET, end=" ")
+                elif symbol == LOCATION:
+                    print(IC_LOCATION + symbol + RESET, end=" ")
+        print('')
+
+#--------------------------------------------------------------------------------------------------------------
+#   [GetFiefByCoordinates]
+#   Parameters: yPos, xPos
+#   Returns: fief class at coordinates
+#--------------------------------------------------------------------------------------------------------------
+def GetFiefByCoordinates(yPos, xPos):
+    for filename in os.listdir('fiefs'):
+            with open(os.path.join('fiefs', filename), 'r') as f:
+                tempName = filename[:-4]
+                tempName = Fiefdom()
+                tempName.name = filename[:-4]
+                tempName.read()
+                if int(tempName.yCoordinate) == int(yPos) and int(tempName.xCoordinate) == int(xPos):
+                    return tempName
+#--------------------------------------------------------------------------------------------------------------
+#   [GetStrongholdByCoordinates]
+#   Parameters: yPos, xPos
+#   Returns: fief class at coordinates
+#--------------------------------------------------------------------------------------------------------------
+def GetStrongholdByCoordinates(yPos, xPos):
+    for filename in os.listdir('strongholds'):
+            with open(os.path.join('strongholds', filename), 'r') as f:
+                tempName = filename[:-4]
+                tempName = Stronghold()
+                tempName.name = filename[:-4]
+                tempName.read()
+                if int(tempName.yCoordinate) == int(yPos) and int(tempName.xCoordinate) == int(xPos):
+                    return tempName
+
+#--------------------------------------------------------------------------------------------------------------
+#   [GetLocation]
+#   Parameters: mapClass, yPos, xPos
+#
+#   Looks at current location and determines if there is something there. Returns the name of that thing if
+#   something is found. Otherwise returns "".
+#--------------------------------------------------------------------------------------------------------------
+def GetLocation(mapClass, yPos, xPos):
+    if str(mapClass.worldMap[int(yPos)][int(xPos)]) == FIEF:
+        tempFief = Fiefdom()
+        tempFief = GetFiefByCoordinates(yPos, xPos)
+        if isinstance(tempFief, Fiefdom):
+            return (str(BiomeColor(tempFief.biome) + str(tempFief.name) + RESET), "fief", str(tempFief.name))
+        else:
+            return ("", "", "")
+        
+    elif str(mapClass.worldMap[int(yPos)][int(xPos)]) == STRONGHOLD:
+        tempStronghold = Stronghold()
+        tempStronghold = GetStrongholdByCoordinates(yPos, xPos)
+        if isinstance(tempStronghold, Stronghold):
+            return (str(StrongholdColor(tempStronghold.color) + str(tempStronghold.name) + "'s Stronghold" + RESET), "stronghold", str(tempStronghold.name))
+        else:
+            return ("", "", "")
+        
+    else:
+        return ("", "", "")
+
+#--------------------------------------------------------------------------------------------------------------
+#   [BattalionAtCoords]
+#   Parameters: y, x, coords
+#   Returns: list depending on rather there is a battalion at the passed coordinates
+#--------------------------------------------------------------------------------------------------------------
+def BattalionAtCoords(y, x, coords):
+    for i in range(len(coords)):
+        if int(y) == int(coords[i][0]) and int(x) == int(coords[i][1]):
+            return coords[i]
+    return ""
+
+#--------------------------------------------------------------------------------------------------------------
+#   [GetBattalionRow]
+#   Parameters: y, coords
+#   Returns: list of battalion names
+#--------------------------------------------------------------------------------------------------------------
+def GetBattalionRow(y, coords):
+    battalionRow = []
+    foundOne = False
+    for i in range(len(coords)):
+        if int(y) == int(coords[i][0]):
+            battalionRow.append(str("| " + BattalionIconColor(coords[i][4]) + coords[i][3] + RESET))
+            foundOne = True
+    return battalionRow
+
+#--------------------------------------------------------------------------------------------------------------
+#   [PrintWorldMapWithBattalionsAndLocations]
+#   Parameters: wMap, userName, coords, yPos, xPos
+#
+#   Iterates through a WorldMap and prints a color version. Also prints fiefs along side
+#   Prints location on the map given passed coordinates
+#   Prints colored Battalion icons over other locations (besides current location)
+#--------------------------------------------------------------------------------------------------------------
+def PrintWorldMapWithBattalionsAndLocations(wMap, userName, coords, yPos, xPos):
+    for i in range(MAP_HEIGHT):
+        fiefsInRow = GetFiefRow(i, userName)
+        strongholdsInRow = GetStrongholdRow(i, userName)
+        battalionsInRow = GetBattalionRow(i, coords)
+        for j in range(MAP_WIDTH):
+            battalion = ""
+            symbol = wMap[i][j]
+            if battalionsInRow != "":
+                battalion = BattalionAtCoords(i, j, coords)
+            if j == 0:
+                if j == int(xPos) and i == int(yPos):
+                    print(MAP_SPACER + IC_LOCATION + LOCATION + RESET, end=" ")
+                elif battalion != "":
+                    print(MAP_SPACER + BattalionIconColor(battalion[4]) + BATTALION + RESET, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(MAP_SPACER + IC_UNEXPLORED + symbol + RESET, end=" ")
+                elif symbol == EMPTY:
+                    print(MAP_SPACER + symbol, end=" ")
+                elif symbol == WATER:
+                    print(MAP_SPACER + IC_WATER + symbol + RESET, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(MAP_SPACER + IC_RIVER + symbol + RESET, end=" ")
+                elif symbol == FOREST:
+                    print(MAP_SPACER + IC_FOREST + symbol + RESET, end=" ")
+                elif symbol == PLAINS:
+                    print(MAP_SPACER + IC_PLAINS + symbol + RESET, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(MAP_SPACER + IC_MOUNTAIN + symbol + RESET, end=" ")
+                elif symbol == FIEF:
+                    print(MAP_SPACER + GetFiefByOwner(i, j, userName) + RESET, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(MAP_SPACER + IC_STRONGHOLD + symbol + RESET, end=" ")
+                elif symbol == LOCATION:
+                    print(MAP_SPACER + IC_LOCATION + symbol + RESET, end=" ")
+            elif j == MAP_WIDTH - 1:
+                if j == int(xPos) and i == int(yPos):
+                    print(IC_LOCATION + LOCATION + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif battalion != "":
+                    print(BattalionIconColor(battalion[4]) + BATTALION + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(IC_UNEXPLORED + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == EMPTY:
+                    print(symbol, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == WATER:
+                    print(IC_WATER + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(IC_RIVER + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == FOREST:
+                    print(IC_FOREST + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == PLAINS:
+                    print(IC_PLAINS + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(IC_MOUNTAIN + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == FIEF:
+                    print(GetFiefByOwner(i, j, userName) + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(IC_STRONGHOLD + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+                elif symbol == LOCATION:
+                    print(IC_LOCATION + symbol + RESET, *fiefsInRow, *strongholdsInRow, *battalionsInRow, end=" ")
+            else:
+                if j == int(xPos) and i == int(yPos):
+                    print(IC_LOCATION + LOCATION + RESET, end=" ")
+                elif battalion != "":
+                    print(BattalionIconColor(battalion[4]) + BATTALION + RESET, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(IC_UNEXPLORED + symbol + RESET, end=" ")
+                elif symbol == EMPTY:
+                    print(symbol, end=" ")
+                elif symbol == WATER:
+                    print(IC_WATER + symbol + RESET, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(IC_RIVER + symbol + RESET, end=" ")
+                elif symbol == FOREST:
+                    print(IC_FOREST + symbol + RESET, end=" ")
+                elif symbol == PLAINS:
+                    print(IC_PLAINS + symbol + RESET, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(IC_MOUNTAIN + symbol + RESET, end=" ")
+                elif symbol == FIEF:
+                    print(GetFiefByOwner(i, j, userName) + RESET, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(IC_STRONGHOLD + symbol + RESET, end=" ")
+                elif symbol == LOCATION:
+                    print(IC_LOCATION + symbol + RESET, end=" ")
+        print('')
+
+#--------------------------------------------------------------------------------------------------------------
+#   [PrintWorldMapWithBattalions]
+#   Parameters: wMap, userName, coords, yPos, xPos
+#
+#   Iterates through a WorldMap and prints a color version. Also prints fiefs along side
+#   Prints location on the map given passed coordinates
+#   Prints colored Battalion icons over other locations (besides current location)
+#--------------------------------------------------------------------------------------------------------------
+def PrintWorldMapWithBattalions(wMap, userName, coords, yPos, xPos):
+    for i in range(MAP_HEIGHT):
+        battalionsInRow = GetBattalionRow(i, coords)
+        for j in range(MAP_WIDTH):
+            battalion = ""
+            symbol = wMap[i][j]
+            if battalionsInRow != "":
+                battalion = BattalionAtCoords(i, j, coords)
+            if j == 0:
+                if j == int(xPos) and i == int(yPos):
+                    print(MAP_SPACER + IC_LOCATION + LOCATION + RESET, end=" ")
+                elif battalion != "":
+                    print(MAP_SPACER + BattalionIconColor(battalion[4]) + BATTALION + RESET, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(MAP_SPACER + IC_UNEXPLORED + symbol + RESET, end=" ")
+                elif symbol == EMPTY:
+                    print(MAP_SPACER + symbol, end=" ")
+                elif symbol == WATER:
+                    print(MAP_SPACER + IC_WATER + symbol + RESET, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(MAP_SPACER + IC_RIVER + symbol + RESET, end=" ")
+                elif symbol == FOREST:
+                    print(MAP_SPACER + IC_FOREST + symbol + RESET, end=" ")
+                elif symbol == PLAINS:
+                    print(MAP_SPACER + IC_PLAINS + symbol + RESET, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(MAP_SPACER + IC_MOUNTAIN + symbol + RESET, end=" ")
+                elif symbol == FIEF:
+                    print(MAP_SPACER + GetFiefByOwner(i, j, userName) + RESET, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(MAP_SPACER + IC_STRONGHOLD + symbol + RESET, end=" ")
+                elif symbol == LOCATION:
+                    print(MAP_SPACER + IC_LOCATION + symbol + RESET, end=" ")
+            elif j == MAP_WIDTH - 1:
+                if j == int(xPos) and i == int(yPos):
+                    print(IC_LOCATION + LOCATION + RESET, *battalionsInRow, end=" ")
+                elif battalion != "":
+                    print(BattalionIconColor(battalion[4]) + BATTALION + RESET, *battalionsInRow, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(IC_UNEXPLORED + symbol + RESET, *battalionsInRow, end=" ")
+                elif symbol == EMPTY:
+                    print(symbol, *battalionsInRow, end=" ")
+                elif symbol == WATER:
+                    print(IC_WATER + symbol + RESET, *battalionsInRow, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(IC_RIVER + symbol + RESET, *battalionsInRow, end=" ")
+                elif symbol == FOREST:
+                    print(IC_FOREST + symbol + RESET, *battalionsInRow, end=" ")
+                elif symbol == PLAINS:
+                    print(IC_PLAINS + symbol + RESET, *battalionsInRow, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(IC_MOUNTAIN + symbol + RESET, *battalionsInRow, end=" ")
+                elif symbol == FIEF:
+                    print(GetFiefByOwner(i, j, userName) + RESET, *battalionsInRow, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(IC_STRONGHOLD + symbol + RESET, *battalionsInRow, end=" ")
+                elif symbol == LOCATION:
+                    print(IC_LOCATION + symbol + RESET, *battalionsInRow, end=" ")
+            else:
+                if j == int(xPos) and i == int(yPos):
+                    print(IC_LOCATION + LOCATION + RESET, end=" ")
+                elif battalion != "":
+                    print(BattalionIconColor(battalion[4]) + BATTALION + RESET, end=" ")
+                elif symbol == UNEXPLORED:
+                    print(IC_UNEXPLORED + symbol + RESET, end=" ")
+                elif symbol == EMPTY:
+                    print(symbol, end=" ")
+                elif symbol == WATER:
+                    print(IC_WATER + symbol + RESET, end=" ")
+                elif symbol == RIVER[0] or symbol == RIVER[1] or symbol == RIVER[2]:
+                    print(IC_RIVER + symbol + RESET, end=" ")
+                elif symbol == FOREST:
+                    print(IC_FOREST + symbol + RESET, end=" ")
+                elif symbol == PLAINS:
+                    print(IC_PLAINS + symbol + RESET, end=" ")
+                elif symbol == MOUNTAIN:
+                    print(IC_MOUNTAIN + symbol + RESET, end=" ")
+                elif symbol == FIEF:
+                    print(GetFiefByOwner(i, j, userName) + RESET, end=" ")
+                elif symbol == STRONGHOLD:
+                    print(IC_STRONGHOLD + symbol + RESET, end=" ")
+                elif symbol == LOCATION:
+                    print(IC_LOCATION + symbol + RESET, end=" ")
+        print('')
+
+#--------------------------------------------------------------------------------------------------------------
+#   [AppendStrongholdColors]
+#   parameters: coords
+#       Adds stronghold color values to each tuple
+#--------------------------------------------------------------------------------------------------------------
+def AppendStrongholdColors(coords):
+    for filename in os.listdir('strongholds'):
+        with open(os.path.join('strongholds', filename), 'r') as f:
+            tempName = filename[:-4]
+            tempName = Stronghold()
+            tempName.name = filename[:-4]
+            tempName.read()
+            for i in range(len(coords)):
+                if str(coords[i][2]) == str(tempName.name):
+                    tempList = list(coords[i])
+                    tempList.append(str(tempName.color))
+                    tempList = tuple(tempList)
+                    coords[i] = tempList
+    return coords
+
+#--------------------------------------------------------------------------------------------------------------
+#   [GenerateBattalionMap]
+#   parameters: mapClass, armyClass, yPos, xPos
+#       Creates and prints a world map with battalion markers
+#--------------------------------------------------------------------------------------------------------------
+def GenerateBattalionMap(mapClass, strongholdClass, armyClass, yPos, xPos):
+    armyClass.read()
+    strongholdClass.read()
+    coords = armyClass.GetBattalionData()
+    coords = AppendStrongholdColors(coords)
+    PrintWorldMapWithBattalions(mapClass.worldMap, strongholdClass.name, coords, yPos, xPos)
+
+#--------------------------------------------------------------------------------------------------------------
+#   [GenerateBattalionMapWithLocations]
+#   parameters: mapClass, armyClass, yPos, xPos
+#       Creates and prints a world map with battalion markers and fief/stronghold locations
+#--------------------------------------------------------------------------------------------------------------
+def GenerateBattalionMapWithLocations(mapClass, strongholdClass, armyClass, yPos, xPos):
+    armyClass.read()
+    strongholdClass.read()
+    coords = armyClass.GetBattalionData()
+    coords = AppendStrongholdColors(coords)
+    PrintWorldMapWithBattalionsAndLocations(mapClass.worldMap, strongholdClass.name, coords, yPos, xPos)
 
 #eof
